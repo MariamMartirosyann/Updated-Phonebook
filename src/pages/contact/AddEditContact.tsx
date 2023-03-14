@@ -1,8 +1,8 @@
 import { Grid, IconButton, Typography } from "@mui/material";
 import PlusIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { Fragment } from "react";
-import { addContact } from "../../app/store/ContactSlice";
+import { Fragment, useEffect } from "react";
+import { addContact, selectContact, updateContact } from "../../app/store/ContactSlice";
 import { IContact, IEmail, IFormData, INumber } from "../../app/intrefaces";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import ButtonLoader from "../../shared/ButtonLoader";
@@ -10,7 +10,8 @@ import InputField from "../../shared/TextInput";
 import { emailRegex, phoneNumberRegex, requiredRules } from "../../validators";
 import { nanoid } from "nanoid";
 import toast from "react-hot-toast";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router";
 
 const emailDefaultValue: IEmail = {
   id: nanoid(),
@@ -26,6 +27,10 @@ interface IAddEditContactProps {
   editData?: IContact;
 }
 const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
+  const { id } = useParams();
+  const contactData = useSelector(selectContact)
+  const selectedContact = contactData.find((item) => item.id === id);
+
   const dispatch = useDispatch();
   const methods = useForm<IFormData>({
     mode: "all",
@@ -36,7 +41,7 @@ const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
     },
   });
 
-  const { control } = methods;
+  const { control,reset, handleSubmit } = methods;
 
   const emailFieldValue = useFieldArray({
     control,
@@ -64,25 +69,38 @@ const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
     numberFieldValue.remove();
   };
 
-  const onSubmit = async (formData: IFormData) => {
-    // if (editData) {
-    //   toast.success("Contact Updated Successfully");
-    // } else {
+  const onSubmit =  (formData:IFormData) => {
     const newFormData = {
+   
       name: formData.name,
       email: formData.email,
       number: formData.number,
     };
-    dispatch(addContact(newFormData));
-    toast.success("Contact Added Successfully");
+    // if (editData) {
+    //   dispatch(updateContact(newFormData));
+    //   toast.success("Contact Updated Successfully");
+    // } else {
+   
+    // dispatch(addContact(newFormData));
+    // toast.success("Contact Added Successfully");
     // }
-    console.log(newFormData, "newFormData");
-    onSuccess();
+    
+    // onSuccess();
+    console.log(methods.watch())
   };
 
+  useEffect(() => {
+    if (editData) {
+      reset({
+        name: editData.name,
+        email: editData.email,
+        number: editData.number,
+      });
+    }
+  }, [reset, selectedContact]);
   return (
     <Fragment>
-      <form noValidate onSubmit={methods.handleSubmit(onSubmit)}>
+      <form noValidate onSubmit={handleSubmit(onSubmit)}>
         <FormProvider {...methods}>
           <Grid container spacing={4}>
             <Grid item xs={12}>
@@ -151,7 +169,7 @@ const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
             <Grid item xs={12}>
               <ButtonLoader
                 fullWidth
-                onClick={methods.handleSubmit(onSubmit)}
+                onClick={handleSubmit(onSubmit)}
                 isLoading={false}
                 type="submit"
               >
