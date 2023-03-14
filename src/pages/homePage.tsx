@@ -8,12 +8,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import {
   Button,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
   Paper,
   Typography,
 } from "@mui/material";
@@ -29,16 +23,16 @@ const useStyles: any = makeStyles({
   main: {
     width: "100vw",
     height: "100vh",
-    background: "linear-gradient(#e66465, #9198e5)",
+    background: "linear-gradient(#3f50b5, #9198e5)",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
   },
   table: {
-    width: "65%",
+    width: "55%",
     height: "70%",
     background: "white",
-    padding: "20px",
+    padding: "10px",
   },
   btn: {
     marginRight: "20px",
@@ -58,11 +52,13 @@ const useStyles: any = makeStyles({
     width: "100%",
     textAlign: "center",
     marginBottom: "50px",
+    marginTop:"10px"
   },
   end: {
-    width: "100%",
+    width: "90%",
     textAlign: "end",
-    marginBottom: "20px",
+    marginBottom: "50px",
+    
   },
 });
 
@@ -123,14 +119,14 @@ const Home = () => {
       <Box component={Paper} className={classes.table} elevation={10}>
         <Box className={classes.center}>
           {" "}
-          <Typography variant="h4">Phone Book App</Typography>
+          <Typography variant="h4" color="primary">Phone Book App</Typography>
         </Box>
         <Box className={classes.end}>
           <Button
             onClick={handleOpenModal}
             variant="outlined"
             endIcon={<AddIcon />}
-            size="large"
+            size="small"
           >
             Add Contact
           </Button>
@@ -145,29 +141,7 @@ const Home = () => {
         </BasicModal>
 
         <Box sx={{ width: "80%", justifyContent: "center", margin: "auto" }}>
-          {/* <List>
-            <ListItem disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  <AccountCircleIcon />
-                </ListItemIcon>
-                <ListItemText primary="Name" />
-                <IconButton
-                  className={classes.btn}
-                  edge="end"
-                  aria-label="view"
-                >
-                  <RemoveRedEyeIcon />
-                </IconButton>
-                <IconButton edge="end" aria-label="edit">
-                  <EditIcon />
-                </IconButton>
-                <IconButton edge="end" aria-label="delete">
-                  <DeleteIcon />
-                </IconButton>
-              </ListItemButton>
-            </ListItem>
-          </List> */}
+          
           <BasicTable<IContact>
             data={contactData}
             columns={columns}
