@@ -3,11 +3,11 @@ export interface IContactState {
 }
 
 export interface IEmail{
-    id:string,
+    id:string | number,
     value:string | number,
 }
 export interface INumber{
-  id:string,
+  id:string | number,
   value: number,
 }
 
