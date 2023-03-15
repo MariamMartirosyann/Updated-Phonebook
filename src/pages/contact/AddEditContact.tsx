@@ -7,11 +7,14 @@ import { IContact, IEmail, IFormData, INumber } from "../../app/intrefaces";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import ButtonLoader from "../../shared/ButtonLoader";
 import InputField from "../../shared/TextInput";
-import { emailRegex, phoneNumberRegex, requiredRules } from "../../validators";
+import {
+  emailRule,
+  phoneNumberRegex,
+  requiredRules,
+} from "../../validators";
 import { nanoid } from "nanoid";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { useParams } from "react-router-dom";
 
 const emailDefaultValue: IEmail = {
   id: nanoid(),
@@ -28,7 +31,6 @@ interface IAddEditContactProps {
 }
 
 const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
-  //const { id } = useParams();
   const dispatch = useDispatch();
   const methods = useForm<IFormData>({
     mode: "all",
@@ -39,7 +41,12 @@ const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
     },
   });
 
-  const { control, reset, handleSubmit } = methods;
+  const {
+    control,
+    reset,
+    handleSubmit,
+    formState: { errors },
+  } = methods;
 
   const emailFieldValue = useFieldArray({
     control,
@@ -96,12 +103,11 @@ const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
     }
 
     onSuccess();
-    console.log("submit");
   };
 
   const showRemoveEmail = methods.watch().email.length > 1;
   const showRemoveNumber = methods.watch().number.length > 1;
-  console.error(methods.formState.errors);
+
   useEffect(() => {
     if (editData) {
       reset({
@@ -113,14 +119,21 @@ const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
   }, [editData, reset]);
   return (
     <Fragment>
-      <form noValidate onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <FormProvider {...methods}>
           <Grid container spacing={4}>
             <Grid item xs={12}>
-              <InputField name={"name"} label="Name" rules={requiredRules} />
+              <InputField
+                name={"name"}
+                label="Name"
+                customError={errors?.name?.message}
+                rules={requiredRules}
+              />
             </Grid>
 
             {numberFieldValue.fields?.map((i, index) => {
+
+              console.log(errors?.number?.[index]?.value?.message);
               return (
                 <Grid
                   item
@@ -131,14 +144,14 @@ const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
                   <InputField
                     name={`number.${index}.value`}
                     label="Number"
-                    rules={requiredRules}
-                    // rules={{
-                    //   ...requiredRules,
-                    //   pattern: {
-                    //     value: phoneNumberRegex,
-                    //     message: "Enter only + or numbers, minimum 9 symbols",
-                    //   },
-                    // }}
+                    customError={errors?.number?.[index]?.value?.message}
+                    rules={{
+                      ...requiredRules,
+                      pattern: {
+                        value: phoneNumberRegex,
+                        message: "Enter only + or numbers, minimum 9 symbols",
+                      },
+                    }}
                   />
                   <IconButton color="primary" onClick={handleAddNumber}>
                     <PlusIcon />
@@ -164,14 +177,8 @@ const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
                     key={index}
                     name={`email.${index}.value`}
                     label="Email"
-                    // rules={{
-                    //   ...requiredRules,
-                    //   pattern: {
-                    //     value: emailRegex,
-                    //     message: "Invalid Email",
-                    //   },
-                    // }}
-                    rules={requiredRules}
+                    customError={errors?.email?.[index]?.value?.message}
+                    rules={{ ...requiredRules, ...emailRule }}
                   />
                   <IconButton color="primary" onClick={handleAddEmail}>
                     <PlusIcon />

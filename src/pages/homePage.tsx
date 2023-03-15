@@ -37,17 +37,7 @@ const useStyles: any = makeStyles({
   btn: {
     marginRight: "20px",
   },
-  modalStyle: {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "45%",
-    height: "70%",
-    background: "white",
-    border: "2px solid #000",
-    p: 4,
-  },
+
   center: {
     width: "100%",
     textAlign: "center",
@@ -66,7 +56,6 @@ const Home = () => {
   const classes = useStyles();
  
   const contactData = useSelector(selectContact)
-  console.log(contactData,"contactData")
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [activeContact, setActiveContact] = useState<IContact>();
   const [isWarningOpen, setWarningOpen] = useState(false);
@@ -79,7 +68,7 @@ const Home = () => {
   const onFormSuccess = () => {
     setActiveContact(undefined);
     setOpenModal(false);
-    // handleRefetch();
+ 
   };
   const handleEdit = (row: IContact) => {
     setActiveContact(row);

@@ -19,6 +19,7 @@ interface IInputProps {
   onKeyPress?: (parameter: KeyboardEvent<HTMLDivElement>) => void;
   disabled?: boolean;
   inputRef?: Ref<HTMLInputElement>;
+  customError?: string;
 }
 
 const InputField = ({
@@ -35,6 +36,7 @@ const InputField = ({
   onClear,
   inputRef,
   disabled,
+  customError = "",
 }: IInputProps) => {
   const {
     control,
@@ -78,6 +80,8 @@ const InputField = ({
     return errors?.[name];
   }, [errors, name]);
 
+  console.log(!!customError, !!errorInfo?.());
+
   return (
     <Fragment>
       <Controller
@@ -91,11 +95,9 @@ const InputField = ({
             inputRef={inputRef}
             value={field.value ?? ""}
             placeholder={placeholder}
-            error={!!errorInfo?.() && !disabled}
+            error={customError ? !!customError : !!errorInfo?.()}
             helperText={
-              !disabled && !!errorInfo()
-                ? errorInfo()?.message?.toString()
-                : null
+              customError ? customError : !!errorInfo()?.message?.toString()
             }
             fullWidth
             type={invisible && isSecure ? "password" : type || "text"}
