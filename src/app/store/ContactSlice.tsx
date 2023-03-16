@@ -12,12 +12,13 @@ const contactSlice = createSlice({
   initialState,
   name,
   reducers: {
-    addContact: (state, { payload: { name, number, email } }) => {
+    addContact: (state, { payload: { name, number, email,photo } }) => {
       const newContact = {
         id: nanoid(),
         name,
         number,
         email,
+        photo
       };
       state.list = [...state.list, newContact];
     },

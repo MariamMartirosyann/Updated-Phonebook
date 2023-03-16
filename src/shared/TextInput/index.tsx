@@ -80,8 +80,6 @@ const InputField = ({
     return errors?.[name];
   }, [errors, name]);
 
-  console.log(!!customError, !!errorInfo?.());
-
   return (
     <Fragment>
       <Controller

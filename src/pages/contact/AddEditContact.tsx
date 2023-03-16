@@ -1,17 +1,13 @@
-import { Grid, IconButton, Typography } from "@mui/material";
+import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import PlusIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { Fragment, useEffect } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { addContact, updateContact } from "../../app/store/ContactSlice";
 import { IContact, IEmail, IFormData, INumber } from "../../app/intrefaces";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import ButtonLoader from "../../shared/ButtonLoader";
 import InputField from "../../shared/TextInput";
-import {
-  emailRule,
-  phoneNumberRegex,
-  requiredRules,
-} from "../../validators";
+import { emailRule, phoneNumberRegex, requiredRules } from "../../validators";
 import { nanoid } from "nanoid";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
@@ -32,12 +28,15 @@ interface IAddEditContactProps {
 
 const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
   const dispatch = useDispatch();
+  const [image, setImage] = useState<FileList | null>(null);
+
   const methods = useForm<IFormData>({
     mode: "all",
     defaultValues: {
       name: "",
       email: [emailDefaultValue],
       number: [numberDefaultValue],
+      photo: null,
     },
   });
 
@@ -81,6 +80,10 @@ const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
   const handleRemoveNumber = (index: any) => {
     numberFieldValue.remove(index);
   };
+  const handleRemovePhoto = useCallback(() => {
+    setImage(null);
+    console.log("handleRemovePhoto");
+  }, []);
 
   const onSubmit = (formData: IFormData) => {
     if (editData) {
@@ -89,6 +92,7 @@ const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
         name: formData.name,
         email: formData.email,
         number: formData.number,
+        photo: image,
       };
       dispatch(updateContact(newFormData));
       toast.success("Contact Updated Successfully");
@@ -97,6 +101,7 @@ const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
         name: formData.name,
         email: formData.email,
         number: formData.number,
+        photo: image,
       };
       dispatch(addContact(newFormData));
       toast.success("Contact Added Successfully");
@@ -114,9 +119,14 @@ const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
         name: editData.name,
         email: editData.email,
         number: editData.number,
+        photo: editData.photo,
       });
     }
   }, [editData, reset]);
+
+  useEffect(() => {
+    handleRemovePhoto();
+  }, [handleRemovePhoto]);
   return (
     <Fragment>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -132,7 +142,6 @@ const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
             </Grid>
 
             {numberFieldValue.fields?.map((i, index) => {
-
               console.log(errors?.number?.[index]?.value?.message);
               return (
                 <Grid
@@ -153,13 +162,24 @@ const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
                       },
                     }}
                   />
-                  <IconButton color="primary" onClick={handleAddNumber}>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={handleAddNumber}
+                    style={{ marginLeft: "5px" }}
+                  >
                     <PlusIcon />
-                  </IconButton>
+                  </Button>
+
                   {showRemoveNumber ? (
-                    <IconButton color="primary" onClick={handleRemoveNumber}>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      style={{ marginLeft: "5px" }}
+                      onClick={handleRemoveNumber}
+                    >
                       <DeleteIcon />
-                    </IconButton>
+                    </Button>
                   ) : null}
                 </Grid>
               );
@@ -180,17 +200,52 @@ const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
                     customError={errors?.email?.[index]?.value?.message}
                     rules={{ ...requiredRules, ...emailRule }}
                   />
-                  <IconButton color="primary" onClick={handleAddEmail}>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={handleAddEmail}
+                    style={{ marginLeft: "5px" }}
+                  >
                     <PlusIcon />
-                  </IconButton>
+                  </Button>
                   {showRemoveEmail ? (
-                    <IconButton color="primary" onClick={handleRemoveEmail}>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      style={{ marginLeft: "5px" }}
+                      onClick={handleRemoveEmail}
+                    >
                       <DeleteIcon />
-                    </IconButton>
+                    </Button>
                   ) : null}
                 </Grid>
               );
             })}
+
+            <Grid item xs={12} >
+            <Box display="none">
+                <input
+                  name="Search"
+                  type="file"
+                  onChange={(e) => setImage(e.target.files)}
+                />
+                </Box>
+              <Button
+                variant="contained"
+                size="large"
+                style={{ marginLeft: "5px" }}
+                onClick={handleRemovePhoto}
+              >
+                Add Photo
+              </Button>
+            </Grid>
+
+            {!!editData?.photo ? (
+              <Grid item xs={12}>
+                <img src={editData?.photo} alt="contact" width={"100px"} />
+              
+              </Grid>
+            ) : null}
 
             <Grid item xs={12}>
               <ButtonLoader

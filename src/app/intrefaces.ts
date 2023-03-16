@@ -16,20 +16,26 @@ export interface IContact {
   name: string;
   email: IEmail[];
   number: INumber[];
+  photo:any
 }
 export interface IAddEditContact {
   id: string;
   name: string;
   email: IEmail[];
   number: INumber[];
+  photo:any
 }
 export interface IFormData {
   name: string;
   email: IEmail[];
   number: INumber[];
+  photo:any
 }
 
 export interface IState {
   contact: IContactState;
 }
 
+export interface IValue {
+  value: string 
+}

@@ -1,6 +1,7 @@
 import { Grid, Typography } from "@mui/material";
 import { IContact } from "../../app/intrefaces";
 
+
 interface IContactDetailProps {
     data?: IContact;
   }
@@ -8,6 +9,12 @@ interface IContactDetailProps {
 const ContactDetail = ({data}:IContactDetailProps) => {
   return (
     <Grid container spacing={5} mb={6}>
+        <Grid item xs={6}>
+        <Typography fontSize={14} fontWeight={"600"}>
+          Contact Photo
+        </Typography>
+        <img src={data?.photo} alt="Contact" width={"100px"}/>
+      </Grid>
       <Grid item xs={12}>
         <Typography fontSize={14} fontWeight={"600"}>
           Contact Name

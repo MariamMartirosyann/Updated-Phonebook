@@ -8,10 +8,11 @@ import {
   Divider,
   Grid,
   Paper,
+  TextField,
   Typography,
 } from "@mui/material";
 import BasicModal from "../../shared/Modal/BasicModal";
-import { IContact } from "../../app/intrefaces";
+import { IContact, IEmail, INumber } from "../../app/intrefaces";
 import AddEditContact from "../contact/AddEditContact";
 import BasicTable from "../../shared/Table";
 import {
@@ -24,8 +25,6 @@ import ContactDetail from "../contact/ContactDetail";
 import SharedDialog from "../../shared/Dialog";
 import toast from "react-hot-toast";
 import { FormProvider, useForm } from "react-hook-form";
-import Filters from "./filters";
-import InputField from "../../shared/TextInput";
 
 const useStyles: any = makeStyles({
   main: {
@@ -38,7 +37,7 @@ const useStyles: any = makeStyles({
   },
   table: {
     width: "55%",
-    height: "70%",
+    height: "80%",
     background: "white",
     padding: "10px",
   },
@@ -64,7 +63,8 @@ const Home = () => {
   const dispatch = useDispatch();
   const methods = useForm({});
 
-  const contactData = useSelector(selectContact);
+  let contactData = useSelector(selectContact);
+  const [value, setValue] = useState<string | " ">("");
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [activeContact, setActiveContact] = useState<IContact>();
   const [isWarningOpen, setWarningOpen] = useState(false);
@@ -94,16 +94,43 @@ const Home = () => {
     setWarningOpen(true);
   };
 
+  const filterNameData = contactData.filter((i: IContact) =>
+    i.name.toLowerCase().includes(value)
+  );
+
+  const filterNumberData = () => {
+    const a = contactData.filter((i: IContact) => {
+      const b = i.number.some((i: INumber) =>
+        i.value.toString().includes(value)
+      );
+      return b;
+    });
+    return a;
+  };
+
+  const filterEmailData = () => {
+    const a = contactData.filter((i: IContact) => {
+      const b = i.email.some((i: IEmail) => i.value.toString().includes(value));
+      return b;
+    });
+    return a;
+  };
+
+  const filterData = [
+    ...filterNameData,
+    ...filterNumberData(),
+    ...filterEmailData(),
+  ];
+
+  const handleClear = () => {
+    setValue("");
+  };
+
   const handleDelete = () => {
     dispatch(deleteContact(activeContact));
     toast.success("Contact deleted");
   };
 
-  const filterData=(value:any) => contactData.filter((i:IContact) =>
-  i.name.toLowerCase().includes(value)
-);
-  const handleDrawTable = !!filterData? filterData :contactData
-   
   const getActions = (rowData: IContact) => {
     return [
       {
@@ -132,41 +159,40 @@ const Home = () => {
             Phone Book App
           </Typography>
         </Box>
-        <Box mt={4} ml={10}>
+        <Box mt={2} ml={10}>
           <FormProvider {...methods}>
-            <Box mt={2} mb={2}>
+            <Box mt={2} mb={2} ml={2}>
               <Box
                 display="flex"
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <Grid container spacing={4} alignItems="center">
+                <Grid container spacing={2} alignItems="center">
                   <Grid item xs={3}>
-                    <InputField name="search" label={"Search"} />
+                    <TextField
+                      name="Search"
+                      size="small"
+                      className="searchBar"
+                      label="Search"
+                      onChange={(e) => setValue(e.target.value)}
+                    ></TextField>
                   </Grid>
 
                   <Grid item xs={3}>
-                    <ButtonGroup variant="contained">
-                      <Button
-                        //onClick={onChange}
-                        color="primary"
-                        variant="contained"
-                      >
-                        Apply
-                      </Button>
-                      <Button
-                        //onClick={handleClear}
-                        color="inherit"
-                      >
-                        Clear
-                      </Button>
-                    </ButtonGroup>
+                    <Button
+                      variant="outlined"
+                      size="medium"
+                      onClick={handleClear}
+                      color="primary"
+                    >
+                      Clear
+                    </Button>
                   </Grid>
                 </Grid>
               </Box>
             </Box>
           </FormProvider>
-          <Divider />
+
         </Box>
         <Box className={classes.end}>
           <Button
@@ -188,16 +214,28 @@ const Home = () => {
         </BasicModal>
 
         <Box sx={{ width: "80%", justifyContent: "center", margin: "auto" }}>
-          <BasicTable<IContact>
-            data={contactData}
-            columns={columns}
-            getActions={getActions}
-            filterOptions={{
-              reset: methods.reset,
-              watch: methods.watch,
-            }}
-          />
-
+          {" "}
+          {!!value ? (
+            <BasicTable<IContact>
+              data={filterData}
+              columns={columns}
+              getActions={getActions}
+              filterOptions={{
+                reset: methods.reset,
+                watch: methods.watch,
+              }}
+            />
+          ) : (
+            <BasicTable<IContact>
+              data={contactData}
+              columns={columns}
+              getActions={getActions}
+              filterOptions={{
+                reset: methods.reset,
+                watch: methods.watch,
+              }}
+            />
+          )}
           <BasicModal
             open={isViewModalOpen}
             setOpen={setViewModalOpen}
@@ -206,7 +244,6 @@ const Home = () => {
           >
             <ContactDetail data={activeContact} />
           </BasicModal>
-
           <SharedDialog
             open={isWarningOpen}
             setOpen={setWarningOpen}
