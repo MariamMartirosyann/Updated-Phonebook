@@ -1,49 +1,83 @@
-import { Grid, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardMedia,
+  Typography,
+} from "@mui/material";
 import { IContact } from "../../app/intrefaces";
-
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { app } from "../../firebase";
+import { useEffect, useState } from "react";
 
 interface IContactDetailProps {
-    data?: IContact;
-  }
-  
-const ContactDetail = ({data}:IContactDetailProps) => {
-  return (
-    <Grid container spacing={5} mb={6}>
-        <Grid item xs={6}>
-        <Typography fontSize={14} fontWeight={"600"}>
-          Contact Photo
-        </Typography>
-        <img src={data?.photo} alt="Contact" width={"100px"}/>
-      </Grid>
-      <Grid item xs={12}>
-        <Typography fontSize={14} fontWeight={"600"}>
-          Contact Name
-        </Typography>
-        <Typography fontSize={16}>{data?.name}</Typography>
-      </Grid>
-      <Grid item xs={12}>
-        <Typography fontSize={14} fontWeight={"600"}>
-          Id
-        </Typography>
-        <Typography fontSize={16}>{data?.id}</Typography>
-      </Grid>
-
-      <Grid item xs={12}>
-        <Typography fontSize={14} fontWeight={"600"}>
-          Number
-        </Typography>
-        <Typography fontSize={16}> {data?.number?.map((i)=>{return <li key={i.id}>{i.value}</li>})}</Typography>
-      </Grid>
-
-      <Grid item xs={12}>
-        <Typography fontSize={14} fontWeight={"600"}>
-          Email
-        </Typography>
-        <Typography fontSize={16}> {data?.email?.map((i)=>{return <li key={i.id}>{i.value}</li>})}</Typography>
-      </Grid>
-      
-    </Grid>
-  )
+  data?: IContact;
 }
 
-export default ContactDetail
+const ContactDetail = ({ data }: IContactDetailProps) => {
+  const [firebaseUrl, setFirebaseUrl] = useState<string>();
+
+  const downloadFromFirebase = async (name: string) => {
+    const storage = getStorage(app);
+    const storageRef = ref(storage, name);
+    const url = await getDownloadURL(storageRef);
+    setFirebaseUrl(url);
+  };
+
+  useEffect(() => {
+    downloadFromFirebase(data?.photo);
+  }, [data]);
+
+  return (
+    <Card sx={{ maxWidth: 600, marginBottom:"40px"}}>
+      <CardContent
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-around",
+        }}
+      >
+        <CardMedia
+          sx={{ width: 200, height: 200 }}
+          image={firebaseUrl}
+          title="contact"
+        />
+        <Box>
+          {" "}
+          <Typography gutterBottom variant="h5" component="div">
+            {data?.name}
+          </Typography>
+          <Box mt={2}>
+            {" "}
+            <Typography variant="h6" component="div">
+              Email:{" "}
+            </Typography>
+            <Typography gutterBottom fontSize={16} component="div">
+              {data?.email?.map((i) => {
+                return <li key={i.id}>{i.value}</li>;
+              })}
+            </Typography>
+          </Box>
+          <Box mt={2}>
+          <Typography variant="h6" component="div">
+            Email:{" "}
+          </Typography>
+          <Typography fontSize={16}>
+            {data?.number?.map((i) => {
+              return <li key={i.id}>{i.value}</li>;
+            })}
+          </Typography>
+          </Box>
+        </Box>
+      </CardContent>
+      <CardContent>
+        <Typography fontSize={16}> Id: {data?.id}</Typography>
+      </CardContent>
+    </Card>
+
+  );
+};
+
+export default ContactDetail;
