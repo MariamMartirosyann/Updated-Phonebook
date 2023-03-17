@@ -48,7 +48,7 @@ const BasicModal = ({
     <Modal open={open} onClose={handleClose}>
       <Box className={classes.modalStyle}>
         <Box mt={2} mb={4} className={classes.center}>
-          <Typography variant="h6">{title}</Typography>
+          <Typography variant="h6" color="primary">{title}</Typography>
         </Box>
         {children}
         <Box
@@ -58,6 +58,7 @@ const BasicModal = ({
           sx={{ cursor: "pointer" }}
         >
           <ButtonLoader
+            variant="outlined"
             fullWidth
             onClick={handleClose}
             isLoading={false}

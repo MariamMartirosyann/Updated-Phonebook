@@ -1,16 +1,14 @@
+import { useEffect, useState } from "react";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { app } from "../../firebase";
+import { IContact } from "../../app/intrefaces";
 import {
   Box,
-  Button,
   Card,
-  CardActions,
   CardContent,
   CardMedia,
   Typography,
 } from "@mui/material";
-import { IContact } from "../../app/intrefaces";
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
-import { app } from "../../firebase";
-import { useEffect, useState } from "react";
 
 interface IContactDetailProps {
   data?: IContact;

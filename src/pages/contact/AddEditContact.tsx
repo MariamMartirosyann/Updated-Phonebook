@@ -2,10 +2,16 @@ import { Box, Button, FormHelperText, Grid, Typography } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import PlusIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { Fragment,  useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { addContact, updateContact } from "../../app/store/ContactSlice";
 import { IContact, IEmail, IFormData, INumber } from "../../app/intrefaces";
-import { Controller, FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
+import {
+  Controller,
+  FormProvider,
+  useFieldArray,
+  useForm,
+  useWatch,
+} from "react-hook-form";
 import ButtonLoader from "../../shared/ButtonLoader";
 import InputField from "../../shared/TextInput";
 import { emailRule, phoneNumberRegex, requiredRules } from "../../validators";
@@ -13,22 +19,26 @@ import { nanoid } from "nanoid";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { getBase64 } from "../../shared/constants";
-import { UploadResult, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
-import { app} from "../../firebase";
+import {
+  UploadResult,
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytes,
+} from "firebase/storage";
+import { app } from "../../firebase";
 
 const useStyles: any = makeStyles({
   imgWrapper: {
     width: 200,
-    height: 200,
+    // height: 200,
     "& img": {
       maxWidth: "100%",
       maxHeight: "100%",
       objectFit: "contain",
     },
   },
-  uploadImg:{
-    
-  },
+
   error: {
     marginLeft: "13px",
   },
@@ -52,7 +62,7 @@ const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
   const dispatch = useDispatch();
   const classes = useStyles();
   const fileInputRef = useRef<any>(null);
-  
+
   const [firebaseUrl, setFirebaseUrl] = useState<string>();
   const [editDataState, setEditDataState] = useState<
     IContact | null | undefined
@@ -68,14 +78,12 @@ const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
     },
   });
 
-  
   const {
     control,
     reset,
     handleSubmit,
     formState: { errors },
   } = methods;
-
 
   const photoUrlWatch = useWatch({
     control: methods.control,
@@ -153,8 +161,7 @@ const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
     setFirebaseUrl(url);
   };
 
-
-  const onSubmit =  async(formData: IFormData) => {
+  const onSubmit = async (formData: IFormData) => {
     if (editData) {
       let photo = formData.photo;
       if (editData?.photo !== editDataState?.photo) {
@@ -207,11 +214,9 @@ const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
         photo: editData.photo,
       });
 
-      downloadFromFirebase(editData.photo)
+      downloadFromFirebase(editData.photo);
     }
   }, [editData, reset]);
-
-
 
   return (
     <Fragment>
@@ -228,7 +233,7 @@ const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
             </Grid>
 
             {numberFieldValue.fields?.map((i, index) => {
-             //console.log(errors?.number?.[index]?.value?.message,"errors");
+              //console.log(errors?.number?.[index]?.value?.message,"errors");
               return (
                 <Grid
                   item
@@ -249,7 +254,7 @@ const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
                     }}
                   />
                   <Button
-                    variant="contained"
+                   variant="outlined"
                     size="small"
                     onClick={handleAddNumber}
                     style={{ marginLeft: "5px" }}
@@ -259,7 +264,7 @@ const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
 
                   {showRemoveNumber ? (
                     <Button
-                      variant="contained"
+                    variant="outlined"
                       size="small"
                       style={{ marginLeft: "5px" }}
                       onClick={handleRemoveNumber}
@@ -287,7 +292,7 @@ const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
                     rules={{ ...requiredRules, ...emailRule }}
                   />
                   <Button
-                    variant="contained"
+                    variant="outlined"
                     size="small"
                     onClick={handleAddEmail}
                     style={{ marginLeft: "5px" }}
@@ -296,7 +301,7 @@ const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
                   </Button>
                   {showRemoveEmail ? (
                     <Button
-                      variant="contained"
+                      variant="outlined"
                       size="small"
                       style={{ marginLeft: "5px" }}
                       onClick={handleRemoveEmail}
@@ -308,61 +313,59 @@ const AddEditContact = ({ onSuccess, editData }: IAddEditContactProps) => {
               );
             })}
 
-            <Grid item xs={12} className={classes.uploadImg}>
-            <Box display="none">
-              <Controller
-                name="photo"
-                control={methods.control}
-                rules={requiredRules}
-                render={({ field }) => (
-                  <input
-                    {...field}
-                    value={""}
-                    type="file"
-                    accept="image/*"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                  />
-                )}
-              />
-            </Box>
+            <Grid item xs={12}>
+              <Box display="none">
+                <Controller
+                  name="photo"
+                  control={methods.control}
+                  rules={requiredRules}
+                  render={({ field }) => (
+                    <input
+                      {...field}
+                      value={""}
+                      type="file"
+                      accept="image/*"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                    />
+                  )}
+                />
+              </Box>
               <Button
-                variant="contained"
+                variant="outlined"
                 size="large"
-                style={{ marginLeft: "5px", marginBottom:"5px" }}
+                style={{ width: "200px", marginBottom: "15px" }}
                 onClick={triggerFileUpload}
               >
                 Add Photo
               </Button>
             </Grid>
 
-
             {methods.formState?.errors?.photo ? (
-                <FormHelperText error className={classes.error}>
-                  {methods.formState?.errors?.photo?.message}
-                </FormHelperText>
-              ) : (
-                ""
-              )}
+              <FormHelperText error className={classes.error}>
+                {methods.formState?.errors?.photo?.message}
+              </FormHelperText>
+            ) : (
+              ""
+            )}
+          </Grid>
+          {photoUrlWatch ? (
+            <Grid item xs={12} className={classes.imgWrapper}>
+              <img src={previewSrc} alt="contact" />
             </Grid>
-            {photoUrlWatch ? (
-              <Grid item xs={12} className={classes.imgWrapper} >
-                <img src={previewSrc}  alt="contact" />
-              </Grid>
-            ) : null}
+          ) : null}
 
-
-            <Grid item xs={12}>
-              <ButtonLoader
-                fullWidth
-                onClick={handleSubmit(onSubmit)}
-                isLoading={false}
-                type="submit"
-              >
-                <Typography>Save</Typography>
-              </ButtonLoader>
-            </Grid>
-         
+          <Grid item xs={12} mt={2}>
+            <ButtonLoader
+              fullWidth
+              variant="outlined"
+              onClick={handleSubmit(onSubmit)}
+              isLoading={false}
+              type="submit"
+            >
+              <Typography>Save</Typography>
+            </ButtonLoader>
+          </Grid>
         </FormProvider>
       </form>
     </Fragment>
