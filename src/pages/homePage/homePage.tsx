@@ -183,7 +183,7 @@ const Home = () => {
                       onClick={handleClear}
                       color="primary"
                     >
-                      Clear
+                      Clearrrr
                     </Button>
                   </Grid>
                 </Grid>
